@@ -1,0 +1,24 @@
+{
+  "name": "boxsnake",
+  "version": "1.0.0",
+  "description": "Classical snakes but on a box instead",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KashPitan/boxsnake.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/KashPitan/boxsnake/issues"
+  },
+  "homepage": "https://github.com/KashPitan/boxsnake#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "socket.io": "^4.3.1"
+  }
+}
