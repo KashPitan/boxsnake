@@ -15,6 +15,12 @@ App.use(Express.static("public"));
 
 var IO = Socket(Server);
 
+var snakeSpeed=2;
+const players = [];//array of player info objects: x,y location and plane etc.
+const food = []; //array of food objects with location
+const box = []; //dimensions of box to track player locations
+
+
 setInterval(function () {
   //send game state to all connected sockets
   IO.sockets.emit("state");
@@ -40,24 +46,6 @@ IO.on("connection", function (socket) {
 
   //when a movement message is received updates the players position
   socket.on("movement", function (data) {});
-
-  //when the user sends a shoot message(receives mouse location as data)
-  socket.on("shoot", function (data) {
-    //only allows a bullet to be spawned if the user has spawned
-    if (players[socket.id] != undefined && players[socket.id].alive) {
-      var player = players[socket.id];
-      //creates a projectile and adds it to server side projectile array
-      //only spawns a bullet if the player has less than 3 on screen already
-      console.log(players[socket.id].alive);
-      if (player.projectiles.length < 5) {
-        projectiles.push(player.shoot(data));
-        // console.log("spawning projectile");
-        // console.log(projectiles);
-      }
-    } else {
-      console.log("spawn before shooting");
-    }
-  });
 
   //listens for "game events"
   socket.on("game", function (data) {

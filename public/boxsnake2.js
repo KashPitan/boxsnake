@@ -1,32 +1,14 @@
 import {THREEbox,THREEboxgeometry,THREEboxmaterial} from './visuals/test.js';
+import {boxCorner} from './visuals/boxCorner.js';
+import {rendererSetup,cameraSetup,sceneSetup,plightsSetup} from './visuals/setup.js';
+import {snakeObj} from './visuals/snake.js';
 
-var renderer = new THREE.WebGLRenderer({canvas: document.getElementById('sceneWindow'), antialias: true});
+var renderer = rendererSetup;
 
-//background colour
-renderer.setClearColor("rgb(70, 200, 211)");
-renderer.setPixelRatio(window.devicePixelRatio);
-renderer.setSize(window.innerWidth, window.innerHeight);
+var camera = cameraSetup;
+var scene = sceneSetup;
 
-var camera = new THREE.PerspectiveCamera(35, window.innerWidth/window.innerHeight, 0.1, 1000);
-var scene = new THREE.Scene();
-
-var alight = new THREE.AmbientLight("rgb(195,190,201)", 0.85);
-scene.add(alight);
-
-var plight = new THREE.PointLight("rgb(255,255,255)", 0.7);
-scene.add(plight);
-
-var plight1 = new THREE.PointLight("rgb(255,255,255)", 0.5);
-scene.add(plight1);
-
-var plight2 = new THREE.PointLight("rgb(255,255,255)", 0.4);
-scene.add(plight2);
-
-var plight3 = new THREE.PointLight("rgb(255,255,255)", 0.8);
-scene.add(plight3);
-
-var plight4 = new THREE.PointLight("rgb(255,255,255)", 0.5);
-scene.add(plight4);
+var plights = plightsSetup;
 
 //snake variables
 var snakeSpeed=2;
@@ -41,37 +23,19 @@ var specmaterial = new THREE.MeshLambertMaterial({color: "rgb(210,90,210)"});
 var spec = new THREE.Mesh(specgeometry, specmaterial);
 
 //box variables
-var boxgeometry = THREEboxgeometry;
+var boxgeometry = THREEboxgeometry;//is this needed?
 var boxmaterial = THREEboxmaterial;
 var box = THREEbox;
 
-// var box
+//snake coordds
+var snakeX = -5;
+var snakeY = 45;
+var snakeZ = 95;
 
-//box set up
-function boxCorner(x,y,z) {
-	this.x=x;
-	this.y=y;
-	this.z=z;
-	this.getX = function() {
-		return this.x;
-	}
-	this.getY = function() {
-		return this.y;
-	}
-	this.getZ = function() {
-		return this.z;
-	}
-	
-	this.setX = function(x) {
-		this.x=x;
-	}
-	this.setY = function(y) {
-		this.y=y;
-	}
-	this.setZ = function(z) {
-		this.z=z;
-	}
-}
+var snakey = new snakeObj();
+
+//initial snake movement direction
+var snakeDir = RIGHT;
 
 //box plane constants
 var FRONT=5;
@@ -86,48 +50,50 @@ var boxPlane = FRONT;
 
 //set up box planes
 var scaled = 85;
+var scaleu = 95;
+
 // //FRONT
-// var bp0 = [scaled,scaled,scaleu];
-// var bp1 = [scaled,-scaled,scaleu];
-// var bp2 = [-scaled,scaled,scaleu];
-// var bp3 = [-scaled,-scaled,scaleu];
+var bp0 = [scaled,scaled,scaleu];
+var bp1 = [scaled,-scaled,scaleu];
+var bp2 = [-scaled,scaled,scaleu];
+var bp3 = [-scaled,-scaled,scaleu];
 
 // //TOP
-// var bp4 = [scaled,scaleu,scaled];
-// var bp5 = [scaled,scaleu,-scaled];
-// var bp6 = [-scaled,scaleu,scaled];
-// var bp7 = [-scaled,scaleu,-scaled];
+var bp4 = [scaled,scaleu,scaled];
+var bp5 = [scaled,scaleu,-scaled];
+var bp6 = [-scaled,scaleu,scaled];
+var bp7 = [-scaled,scaleu,-scaled];
 
 // //RIGHTSIDE
-// var bp8 = [scaleu,scaled,scaled];
-// var bp9 = [scaleu,-scaled,scaled];
-// var bp10 = [scaleu,scaled,-scaled];
-// var bp11 = [scaleu,-scaled,-scaled];
+var bp8 = [scaleu,scaled,scaled];
+var bp9 = [scaleu,-scaled,scaled];
+var bp10 = [scaleu,scaled,-scaled];
+var bp11 = [scaleu,-scaled,-scaled];
 
-// //LEFTSIDE
-// var bp12 = [-scaleu,scaled,scaled];
-// var bp13 = [-scaleu,-scaled,scaled];
-// var bp14 = [-scaleu,scaled,-scaled];
-// var bp15 = [-scaleu,-scaled,-scaled];
+//LEFTSIDE
+var bp12 = [-scaleu,scaled,scaled];
+var bp13 = [-scaleu,-scaled,scaled];
+var bp14 = [-scaleu,scaled,-scaled];
+var bp15 = [-scaleu,-scaled,-scaled];
 
-// //BACK
-// var bp16 = [scaled,scaled,-scaleu];
-// var bp17 = [-scaled,scaled,-scaleu];
-// var bp18 = [scaled,-scaled,-scaleu];
-// var bp19 = [-scaled,-scaled,-scaleu];
+//BACK
+var bp16 = [scaled,scaled,-scaleu];
+var bp17 = [-scaled,scaled,-scaleu];
+var bp18 = [scaled,-scaled,-scaleu];
+var bp19 = [-scaled,-scaled,-scaleu];
 
-// //BOTTOM
-// var bp20 = [scaled,-scaleu,scaled];
-// var bp21 = [scaled,-scaleu,-scaled];
-// var bp22 = [-scaled,-scaleu,scaled];
-// var bp23 = [-scaled,-scaleu,-scaled];
+//BOTTOM
+var bp20 = [scaled,-scaleu,scaled];
+var bp21 = [scaled,-scaleu,-scaled];
+var bp22 = [-scaled,-scaleu,scaled];
+var bp23 = [-scaled,-scaleu,-scaled];
 
-// var boxCornerPlanes = [bp0,bp1,bp2,bp3,
-// 					bp4,bp5,bp6,bp7,
-// 					bp8,bp9,bp10,bp11,
-// 					bp12,bp13,bp14,bp15,
-// 					bp16,bp17,bp18,bp19,
-//           bp20,bp21,bp22,bp23]
+var boxCornerPlanes = [bp0,bp1,bp2,bp3,
+					bp4,bp5,bp6,bp7,
+					bp8,bp9,bp10,bp11,
+					bp12,bp13,bp14,bp15,
+					bp16,bp17,bp18,bp19,
+          bp20,bp21,bp22,bp23]
 
 var b0 = new boxCorner(scaled+0.5,scaled+0.5,scaled+0.5);
 var b1 = new boxCorner(scaled+0.5,-scaled-0.5,-scaled-0.5);
@@ -178,11 +144,13 @@ function transformCamera() {
 }
 
 function transformLights() {
-	plight.position.set(0,180,180);
-	plight1.position.set(0,180,0);
-	plight2.position.set(-180,0,-0);
-	plight3.position.set(180,0,0);
-	plight4.position.set(0,-180,0);
+
+  plights[0].position.set(0,180,180);
+	plights[1].position.set(0,180,0);
+	plights[2].position.set(-180,0,-0);
+	plights[3].position.set(180,0,0);
+  plights[4].position.set(0,-180,0);
+
 }
 
 function initialiseScene() {
@@ -199,8 +167,36 @@ function initialiseSpec() {
 	spec.position.set(0,0,0);
 }
 
-// renderer.render(scene, camera);
+function initialiseSnake() {
+	snake.position.set(snakeX,snakeY,snakeZ);
+}
 
+var count=8;
+var anim=0;
+var animate;
+var purp = 70;
+var animSpeed=1;
+var purp2=81;
+
+function animateSnake() {
+	
+	if (anim<10) {
+		if (purp>255) {
+			animSpeed*=-1;
+		}
+		purp+=40*animSpeed;
+		purp2-=animSpeed*10;
+		for (i = 0; i<snakey.body.length; i++) {
+			snakey.bodyObj[i].material = new THREE.MeshLambertMaterial({color: "rgb(249, " + purp2 + ", "+ purp + ")"});
+		}
+		animate = setTimeout(animateSnake, 100);
+		//console.log(anim +  "pr: " +  purp);
+		anim++;
+	}
+	else {
+		clearTimeout(animate);
+	}
+}
 
 function renderScene() {
 	
@@ -215,8 +211,11 @@ function renderScene() {
 		// moveSnake();
 		// trail();
 	// }
-  // updateCamera()
+	// updateCamera()
+	snakey.body=[];
+	snakey.bodyObj=[];
   initialiseBox();
+  prepareCorners();
   initialiseScene();
   initialiseSpec();
 
@@ -225,7 +224,6 @@ function renderScene() {
 	requestAnimationFrame(renderScene);
 }
 
-
 // genOriginalFoodLoc();
 // prepareCorners();
 // // genOriginalObsLoc();
@@ -233,35 +231,6 @@ function renderScene() {
 // initialiseSpec();
 
 renderScene();
-
-
-
-//move to player function
-// function snakeObj(){
-// 	this.body = [];
-// 	this.bodyObj = [];
-// 	this.bodyLength = 0;
-	
-// 	this.getBody = function() {
-// 		return this.body;
-// 	}
-// 	this.getbodyLength = function() {
-// 		return this.bodyLength;
-// 	}
-// 	this.setbodyLength = function(len) {
-// 		this.bodyLength=len;
-// 	}
-// 	this.addBody = function(x,y,z) {
-// 		this.body.push(new section(x,y,z));
-		
-		
-// 		var bodygeometry = new THREE.CubeGeometry(10,10,10);
-// 		var bodymaterial = new THREE.MeshLambertMaterial({color: "rgb(249, 81, 69)"});
-		
-// 		this.bodyObj.push(new THREE.Mesh(bodygeometry, bodymaterial));
-// 		//console.log("Just added " + this.bodyObj[this.bodyObj.length-1]);
-// 	}
-// }
 
 //what does this do?
 // requestAnimationFrame(renderScene);
